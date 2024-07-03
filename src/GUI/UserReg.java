@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Vector;
 import javax.swing.ButtonModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -28,6 +29,46 @@ public class UserReg extends javax.swing.JFrame {
     public UserReg() {
         initComponents();
         loadCountries();
+        loadUsers();
+    }
+    
+    private void loadUsers() {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/sad-test", "root", "root");
+            Statement statement = connection.createStatement();
+            
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM `user`");
+            
+            while (resultSet.next()) {                
+                Vector vector = new Vector();
+                vector.add(resultSet.getString("user_id"));
+                vector.add(resultSet.getString("first_name"));
+                vector.add(resultSet.getString("last_name"));
+                vector.add(resultSet.getString("username"));
+                vector.add(resultSet.getString("password"));
+                vector.add(resultSet.getString("gender_id"));
+                vector.add(resultSet.getString("country_id"));
+                
+                DefaultTableModel dtm = (DefaultTableModel)jTable1.getModel();
+                dtm.addRow(vector);
+                jTable1.setModel(dtm);
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void reset() {
+        jTextField1.setText("");
+        jTextField2.setText("");
+        jTextField3.setText("");
+        jPasswordField1.setText("");
+        jComboBox1.setSelectedIndex(0);
+        buttonGroup1.clearSelection();
+        
+        jTextField1.grabFocus();
     }
 
     private void loadCountries() {
@@ -343,6 +384,12 @@ public class UserReg extends javax.swing.JFrame {
                 statement.executeUpdate("INSERT INTO `user`"
                         + "(`first_name`, `last_name`, `username`, `password`, `gender_id`, `country_id`)"
                         + "VALUES('" + firstName + "', '" + lastName + "', '" + username + "', '" + password + "', '" + genderID + "', '" + countryID + "')");
+                
+                System.out.println("User added successfully");
+                reset();
+                loadUsers();
+                
+                
             } catch (Exception e) {
                 e.printStackTrace();
             }
