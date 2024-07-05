@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Vector;
 import javax.swing.ButtonModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -40,6 +41,9 @@ public class UserReg extends javax.swing.JFrame {
             
             ResultSet resultSet = statement.executeQuery("SELECT * FROM `user`");
             
+            DefaultTableModel dtm = (DefaultTableModel)jTable1.getModel();
+            dtm.setRowCount(0);
+            
             while (resultSet.next()) {                
                 Vector vector = new Vector();
                 vector.add(resultSet.getString("user_id"));
@@ -50,10 +54,10 @@ public class UserReg extends javax.swing.JFrame {
                 vector.add(resultSet.getString("gender_id"));
                 vector.add(resultSet.getString("country_id"));
                 
-                DefaultTableModel dtm = (DefaultTableModel)jTable1.getModel();
                 dtm.addRow(vector);
-                jTable1.setModel(dtm);
             }
+            
+            jTable1.setModel(dtm);
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -358,19 +362,19 @@ public class UserReg extends javax.swing.JFrame {
         ButtonModel gender = buttonGroup1.getSelection();
 
         if (firstName.isEmpty()) {
-            System.out.println("First name is required");
+            JOptionPane.showMessageDialog(this, "First name is required", "Warning", JOptionPane.WARNING_MESSAGE);
         } else if (lastName.isEmpty()) {
-            System.out.println("Last name is required");
+            JOptionPane.showMessageDialog(this, "Last name is required", "Warning", JOptionPane.WARNING_MESSAGE);
         } else if (username.isEmpty()) {
-            System.out.println("Username is required");
+            JOptionPane.showMessageDialog(this, "Username is required", "Warning", JOptionPane.WARNING_MESSAGE);
         } else if (password.isEmpty()) {
-            System.out.println("Password is required");
+            JOptionPane.showMessageDialog(this, "Password is required", "Warning", JOptionPane.WARNING_MESSAGE);
         } else if (password.length() <= 6) {
-            System.out.println("Password should be minimum 6 characters long");
+            JOptionPane.showMessageDialog(this, "Password should be minimum 6 characters long", "Warning", JOptionPane.WARNING_MESSAGE);
         } else if (country.equals("Select your country")) {
-            System.out.println("Country is required");
+            JOptionPane.showMessageDialog(this, "Select your country", "Warning", JOptionPane.WARNING_MESSAGE);
         } else if (gender == null) {
-            System.out.println("Gender is required");
+            JOptionPane.showMessageDialog(this, "Gender is required", "Warning", JOptionPane.WARNING_MESSAGE);
         } else {
 
             String genderID = gender.getActionCommand();
@@ -385,7 +389,12 @@ public class UserReg extends javax.swing.JFrame {
                         + "(`first_name`, `last_name`, `username`, `password`, `gender_id`, `country_id`)"
                         + "VALUES('" + firstName + "', '" + lastName + "', '" + username + "', '" + password + "', '" + genderID + "', '" + countryID + "')");
                 
-                System.out.println("User added successfully");
+                JOptionPane.showMessageDialog(
+                        this, // parent
+                        "User added successfully", // message
+                        "Confirmation", // title
+                        JOptionPane.INFORMATION_MESSAGE // type
+                );
                 reset();
                 loadUsers();
                 
