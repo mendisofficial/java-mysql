@@ -32,38 +32,38 @@ public class UserReg extends javax.swing.JFrame {
         loadCountries();
         loadUsers();
     }
-    
+
     private void loadUsers() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/sad-test", "root", "root");
             Statement statement = connection.createStatement();
-            
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM `user`");
-            
-            DefaultTableModel dtm = (DefaultTableModel)jTable1.getModel();
+
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM `user` INNER JOIN `country` ON `user`.`country_id` = `country`.`id` INNER JOIN `gender` ON `user`.`gender_id` = `gender`.`id` ORDER BY `user`.`user_id` ASC");
+
+            DefaultTableModel dtm = (DefaultTableModel) jTable1.getModel();
             dtm.setRowCount(0);
-            
-            while (resultSet.next()) {                
+
+            while (resultSet.next()) {
                 Vector vector = new Vector();
                 vector.add(resultSet.getString("user_id"));
                 vector.add(resultSet.getString("first_name"));
                 vector.add(resultSet.getString("last_name"));
                 vector.add(resultSet.getString("username"));
                 vector.add(resultSet.getString("password"));
-                vector.add(resultSet.getString("gender_id"));
-                vector.add(resultSet.getString("country_id"));
-                
-                dtm.addRow(vector);
+                vector.add(resultSet.getString("country.name"));
+                vector.add(resultSet.getString("gender.name"));
+
+                dtm.addRow(vector); // tableRender
             }
-            
-            jTable1.setModel(dtm);
-            
+
+            // no need of this
+            // jTable1.setModel(dtm);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
+
     private void reset() {
         jTextField1.setText("");
         jTextField2.setText("");
@@ -71,7 +71,7 @@ public class UserReg extends javax.swing.JFrame {
         jPasswordField1.setText("");
         jComboBox1.setSelectedIndex(0);
         buttonGroup1.clearSelection();
-        
+
         jTextField1.grabFocus();
     }
 
@@ -295,6 +295,11 @@ public class UserReg extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -388,7 +393,7 @@ public class UserReg extends javax.swing.JFrame {
                 statement.executeUpdate("INSERT INTO `user`"
                         + "(`first_name`, `last_name`, `username`, `password`, `gender_id`, `country_id`)"
                         + "VALUES('" + firstName + "', '" + lastName + "', '" + username + "', '" + password + "', '" + genderID + "', '" + countryID + "')");
-                
+
                 JOptionPane.showMessageDialog(
                         this, // parent
                         "User added successfully", // message
@@ -397,8 +402,7 @@ public class UserReg extends javax.swing.JFrame {
                 );
                 reset();
                 loadUsers();
-                
-                
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -411,8 +415,93 @@ public class UserReg extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1MouseClicked
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        int selectedRow = jTable1.getSelectedRow();
+        String id = String.valueOf(jTable1.getValueAt(selectedRow, 0));
 
+        String firstName = jTextField1.getText();
+        String lastName = jTextField2.getText();
+        String username = jTextField3.getText();
+        String password = String.valueOf(jPasswordField1.getPassword());
+        String country = String.valueOf(jComboBox1.getSelectedItem());
+        ButtonModel gender = buttonGroup1.getSelection();
+
+        if (firstName.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "First name is required", "Warning", JOptionPane.WARNING_MESSAGE);
+        } else if (lastName.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Last name is required", "Warning", JOptionPane.WARNING_MESSAGE);
+        } else if (username.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Username is required", "Warning", JOptionPane.WARNING_MESSAGE);
+        } else if (password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Password is required", "Warning", JOptionPane.WARNING_MESSAGE);
+        } else if (password.length() <= 6) {
+            JOptionPane.showMessageDialog(this, "Password should be minimum 6 characters long", "Warning", JOptionPane.WARNING_MESSAGE);
+        } else if (country.equals("Select your country")) {
+            JOptionPane.showMessageDialog(this, "Select your country", "Warning", JOptionPane.WARNING_MESSAGE);
+        } else if (gender == null) {
+            JOptionPane.showMessageDialog(this, "Gender is required", "Warning", JOptionPane.WARNING_MESSAGE);
+        } else {
+
+            String genderID = gender.getActionCommand();
+            int countryID = countryMap.get(country);
+            
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/sad-test", "root", "root");
+                Statement statement = connection.createStatement();
+                
+                statement.executeUpdate("UPDATE `user` "
+                        + "SET `first_name` = '" + firstName + "', "
+                        + "`last_name` = '" + lastName + "', "
+                        + "`username` = '" + username + "', "
+                        + "`password` = '" + password + "', "
+                        + "`gender_id` = '" + genderID + "', "
+                        + "`country_id` = '" + countryID + "' "
+                        + "WHERE `user_id` = '" + id + "'");
+                
+                reset();
+                loadUsers();
+                
+                jTable1.setEnabled(true);
+                jButton1.setEnabled(true);
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        if (evt.getClickCount() == 2) {
+            
+            jTable1.setEnabled(false);
+            jButton1.setEnabled(false);
+            
+            int selectedRow = jTable1.getSelectedRow();
+
+            String firstName = String.valueOf(jTable1.getValueAt(selectedRow, 1));
+            jTextField1.setText(firstName);
+
+            String lastName = String.valueOf(jTable1.getValueAt(selectedRow, 2));
+            jTextField2.setText(lastName);
+
+            String username = String.valueOf(jTable1.getValueAt(selectedRow, 3));
+            jTextField3.setText(username);
+
+            String password = String.valueOf(jTable1.getValueAt(selectedRow, 4));
+            jPasswordField1.setText(password);
+
+            String country = String.valueOf(jTable1.getValueAt(selectedRow, 5));
+            jComboBox1.setSelectedItem(country);
+
+            String gender = String.valueOf(jTable1.getValueAt(selectedRow, 6));
+            if (gender.equals("Male")) {
+                jRadioButton1.setSelected(true);
+            }
+            if (gender.equals("Female")) {
+                jRadioButton2.setSelected(true);
+            }
+        }
+    }//GEN-LAST:event_jTable1MouseClicked
 
     /**
      * @param args the command line arguments
