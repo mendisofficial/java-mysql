@@ -6,10 +6,20 @@ import java.sql.Statement;
 import java.sql.ResultSet;
 
 public class MySQL {
-    public static ResultSet execute(String query) {
+    private static Connection connection = null;
+    
+    static {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/sad-test", "root", "root");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public static ResultSet execute(String query) {
+        try {  
             Statement statement = connection.createStatement();
             
             if (query.startsWith("SELECT")) {
