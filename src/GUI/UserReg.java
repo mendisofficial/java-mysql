@@ -4,6 +4,7 @@
  */
 package GUI;
 
+import Model.MySQL;
 import com.formdev.flatlaf.FlatDarkLaf;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -35,11 +36,7 @@ public class UserReg extends javax.swing.JFrame {
 
     private void loadUsers() {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/sad-test", "root", "root");
-            Statement statement = connection.createStatement();
-
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM `user` INNER JOIN `country` ON `user`.`country_id` = `country`.`id` INNER JOIN `gender` ON `user`.`gender_id` = `gender`.`id` ORDER BY `user`.`user_id` ASC");
+            ResultSet resultSet = MySQL.execute("SELECT * FROM `user` INNER JOIN `country` ON `user`.`country_id` = `country`.`id` INNER JOIN `gender` ON `user`.`gender_id` = `gender`.`id` ORDER BY `user`.`user_id` ASC");
 
             DefaultTableModel dtm = (DefaultTableModel) jTable1.getModel();
             dtm.setRowCount(0);
@@ -77,11 +74,7 @@ public class UserReg extends javax.swing.JFrame {
 
     private void loadCountries() {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/sad-test", "root", "root");
-            Statement statement = connection.createStatement();
-
-            ResultSet result = statement.executeQuery("SELECT * FROM `country`");
+            ResultSet result = MySQL.execute("SELECT * FROM `country`");
 
             Vector vector = new Vector();
 
@@ -128,6 +121,7 @@ public class UserReg extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
@@ -205,6 +199,26 @@ public class UserReg extends javax.swing.JFrame {
         });
 
         jButton3.setText("Delete user account");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
+        jButton4.setText("View");
+        jButton4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jButton4MousePressed(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jButton4MouseReleased(evt);
+            }
+        });
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -218,7 +232,10 @@ public class UserReg extends javax.swing.JFrame {
                             .addComponent(jTextField1)
                             .addComponent(jTextField2)
                             .addComponent(jTextField3)
-                            .addComponent(jPasswordField1)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jPasswordField1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -237,7 +254,7 @@ public class UserReg extends javax.swing.JFrame {
                             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                 .addComponent(jButton2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                                 .addComponent(jButton3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addGap(0, 4, Short.MAX_VALUE))))
+                        .addGap(0, 2, Short.MAX_VALUE))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -257,7 +274,9 @@ public class UserReg extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton4))
                 .addGap(18, 18, 18)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -308,7 +327,7 @@ public class UserReg extends javax.swing.JFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 563, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 565, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -416,66 +435,71 @@ public class UserReg extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         int selectedRow = jTable1.getSelectedRow();
-        String id = String.valueOf(jTable1.getValueAt(selectedRow, 0));
-
-        String firstName = jTextField1.getText();
-        String lastName = jTextField2.getText();
-        String username = jTextField3.getText();
-        String password = String.valueOf(jPasswordField1.getPassword());
-        String country = String.valueOf(jComboBox1.getSelectedItem());
-        ButtonModel gender = buttonGroup1.getSelection();
-
-        if (firstName.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "First name is required", "Warning", JOptionPane.WARNING_MESSAGE);
-        } else if (lastName.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Last name is required", "Warning", JOptionPane.WARNING_MESSAGE);
-        } else if (username.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Username is required", "Warning", JOptionPane.WARNING_MESSAGE);
-        } else if (password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Password is required", "Warning", JOptionPane.WARNING_MESSAGE);
-        } else if (password.length() <= 6) {
-            JOptionPane.showMessageDialog(this, "Password should be minimum 6 characters long", "Warning", JOptionPane.WARNING_MESSAGE);
-        } else if (country.equals("Select your country")) {
-            JOptionPane.showMessageDialog(this, "Select your country", "Warning", JOptionPane.WARNING_MESSAGE);
-        } else if (gender == null) {
-            JOptionPane.showMessageDialog(this, "Gender is required", "Warning", JOptionPane.WARNING_MESSAGE);
+        
+        if (selectedRow == -1) {
+            System.out.println("Please select a row");
         } else {
+            String id = String.valueOf(jTable1.getValueAt(selectedRow, 0));
 
-            String genderID = gender.getActionCommand();
-            int countryID = countryMap.get(country);
-            
-            try {
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/sad-test", "root", "root");
-                Statement statement = connection.createStatement();
-                
-                statement.executeUpdate("UPDATE `user` "
-                        + "SET `first_name` = '" + firstName + "', "
-                        + "`last_name` = '" + lastName + "', "
-                        + "`username` = '" + username + "', "
-                        + "`password` = '" + password + "', "
-                        + "`gender_id` = '" + genderID + "', "
-                        + "`country_id` = '" + countryID + "' "
-                        + "WHERE `user_id` = '" + id + "'");
-                
-                reset();
-                loadUsers();
-                
-                jTable1.setEnabled(true);
-                jButton1.setEnabled(true);
-                
-            } catch (Exception e) {
-                e.printStackTrace();
+            String firstName = jTextField1.getText();
+            String lastName = jTextField2.getText();
+            String username = jTextField3.getText();
+            String password = String.valueOf(jPasswordField1.getPassword());
+            String country = String.valueOf(jComboBox1.getSelectedItem());
+            ButtonModel gender = buttonGroup1.getSelection();
+
+            if (firstName.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "First name is required", "Warning", JOptionPane.WARNING_MESSAGE);
+            } else if (lastName.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Last name is required", "Warning", JOptionPane.WARNING_MESSAGE);
+            } else if (username.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Username is required", "Warning", JOptionPane.WARNING_MESSAGE);
+            } else if (password.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Password is required", "Warning", JOptionPane.WARNING_MESSAGE);
+            } else if (password.length() <= 6) {
+                JOptionPane.showMessageDialog(this, "Password should be minimum 6 characters long", "Warning", JOptionPane.WARNING_MESSAGE);
+            } else if (country.equals("Select your country")) {
+                JOptionPane.showMessageDialog(this, "Select your country", "Warning", JOptionPane.WARNING_MESSAGE);
+            } else if (gender == null) {
+                JOptionPane.showMessageDialog(this, "Gender is required", "Warning", JOptionPane.WARNING_MESSAGE);
+            } else {
+
+                String genderID = gender.getActionCommand();
+                int countryID = countryMap.get(country);
+
+                try {
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/sad-test", "root", "root");
+                    Statement statement = connection.createStatement();
+
+                    statement.executeUpdate("UPDATE `user` "
+                            + "SET `first_name` = '" + firstName + "', "
+                            + "`last_name` = '" + lastName + "', "
+                            + "`username` = '" + username + "', "
+                            + "`password` = '" + password + "', "
+                            + "`gender_id` = '" + genderID + "', "
+                            + "`country_id` = '" + countryID + "' "
+                            + "WHERE `user_id` = '" + id + "'");
+
+                    reset();
+                    loadUsers();
+
+                    jTable1.setEnabled(true);
+                    jButton1.setEnabled(true);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
         if (evt.getClickCount() == 2) {
-            
+
             jTable1.setEnabled(false);
             jButton1.setEnabled(false);
-            
+
             int selectedRow = jTable1.getSelectedRow();
 
             String firstName = String.valueOf(jTable1.getValueAt(selectedRow, 1));
@@ -503,6 +527,46 @@ public class UserReg extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jTable1MouseClicked
 
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        int selectedRow = jTable1.getSelectedRow();
+        
+        if (selectedRow == -1) {
+            System.out.println("Please select a row");
+        } else {
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/sad-test", "root", "root");
+                Statement statement = connection.createStatement();
+
+
+                String id = String.valueOf(jTable1.getValueAt(selectedRow, 0));
+
+                statement.executeUpdate("DELETE FROM `user` WHERE `user_id` = '" + id + "'");
+
+                loadUsers();
+                reset();
+
+                jTable1.setEnabled(true);
+                jButton1.setEnabled(true);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton4MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton4MousePressed
+        jPasswordField1.setEchoChar('\u0000');
+    }//GEN-LAST:event_jButton4MousePressed
+
+    private void jButton4MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton4MouseReleased
+        jPasswordField1.setEchoChar('\u2022');
+    }//GEN-LAST:event_jButton4MouseReleased
+
     /**
      * @param args the command line arguments
      */
@@ -523,6 +587,7 @@ public class UserReg extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
