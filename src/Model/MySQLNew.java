@@ -19,7 +19,7 @@ public class MySQLNew {
     public static void createConnection() throws Exception {
         if (connection == null) {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/sad-test", "root", "root");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/sad-test", "root", "root");
         }
 
     }
