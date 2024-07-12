@@ -4,12 +4,9 @@
  */
 package GUI;
 
-import Model.MySQL;
+import Model.MySQLNew;
 import com.formdev.flatlaf.FlatDarkLaf;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Vector;
 import javax.swing.ButtonModel;
@@ -36,7 +33,7 @@ public class UserReg extends javax.swing.JFrame {
 
     private void loadUsers() {
         try {
-            ResultSet resultSet = MySQL.execute("SELECT * FROM `user` INNER JOIN `country` ON `user`.`country_id` = `country`.`id` INNER JOIN `gender` ON `user`.`gender_id` = `gender`.`id` ORDER BY `user`.`user_id` ASC");
+            ResultSet resultSet = MySQLNew.executeSearch("SELECT * FROM `user` INNER JOIN `country` ON `user`.`country_id` = `country`.`id` INNER JOIN `gender` ON `user`.`gender_id` = `gender`.`id` ORDER BY `user`.`user_id` ASC");
 
             DefaultTableModel dtm = (DefaultTableModel) jTable1.getModel();
             dtm.setRowCount(0);
@@ -74,7 +71,7 @@ public class UserReg extends javax.swing.JFrame {
 
     private void loadCountries() {
         try {
-            ResultSet result = MySQL.execute("SELECT * FROM `country`");
+            ResultSet result = MySQLNew.executeSearch("SELECT * FROM `country`");
 
             Vector vector = new Vector();
 
@@ -405,11 +402,7 @@ public class UserReg extends javax.swing.JFrame {
             int countryID = countryMap.get(country);
 
             try {
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/sad-test", "root", "root");
-                Statement statement = connection.createStatement();
-
-                statement.executeUpdate("INSERT INTO `user`"
+                MySQLNew.executeIUD("INSERT INTO `user`"
                         + "(`first_name`, `last_name`, `username`, `password`, `gender_id`, `country_id`)"
                         + "VALUES('" + firstName + "', '" + lastName + "', '" + username + "', '" + password + "', '" + genderID + "', '" + countryID + "')");
 
@@ -468,11 +461,7 @@ public class UserReg extends javax.swing.JFrame {
                 int countryID = countryMap.get(country);
 
                 try {
-                    Class.forName("com.mysql.cj.jdbc.Driver");
-                    Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/sad-test", "root", "root");
-                    Statement statement = connection.createStatement();
-
-                    statement.executeUpdate("UPDATE `user` "
+                    MySQLNew.executeIUD("UPDATE `user` "
                             + "SET `first_name` = '" + firstName + "', "
                             + "`last_name` = '" + lastName + "', "
                             + "`username` = '" + username + "', "
@@ -534,14 +523,9 @@ public class UserReg extends javax.swing.JFrame {
             System.out.println("Please select a row");
         } else {
             try {
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/sad-test", "root", "root");
-                Statement statement = connection.createStatement();
-
-
                 String id = String.valueOf(jTable1.getValueAt(selectedRow, 0));
 
-                statement.executeUpdate("DELETE FROM `user` WHERE `user_id` = '" + id + "'");
+                MySQLNew.executeIUD("DELETE FROM `user` WHERE `user_id` = '" + id + "'");
 
                 loadUsers();
                 reset();
