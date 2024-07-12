@@ -29,6 +29,8 @@ public class UserReg extends javax.swing.JFrame {
         initComponents();
         loadCountries();
         loadUsers();
+        jButton2.setEnabled(false);
+        jButton3.setEnabled(false);
     }
 
     private void loadUsers() {
@@ -53,6 +55,10 @@ public class UserReg extends javax.swing.JFrame {
 
             // no need of this
             // jTable1.setModel(dtm);
+            
+            jButton2.setEnabled(false);
+            jButton3.setEnabled(false);
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -428,7 +434,7 @@ public class UserReg extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         int selectedRow = jTable1.getSelectedRow();
-        
+
         if (selectedRow == -1) {
             System.out.println("Please select a row");
         } else {
@@ -470,6 +476,13 @@ public class UserReg extends javax.swing.JFrame {
                             + "`country_id` = '" + countryID + "' "
                             + "WHERE `user_id` = '" + id + "'");
 
+                    JOptionPane.showMessageDialog(
+                            this, // parent
+                            "User updated successfully", // message
+                            "Confirmation", // title
+                            JOptionPane.INFORMATION_MESSAGE // type
+                    );
+
                     reset();
                     loadUsers();
 
@@ -487,6 +500,8 @@ public class UserReg extends javax.swing.JFrame {
         if (evt.getClickCount() == 2) {
 
             jTable1.setEnabled(false);
+            jButton2.setEnabled(true);
+            jButton3.setEnabled(true);
             jButton1.setEnabled(false);
 
             int selectedRow = jTable1.getSelectedRow();
@@ -518,7 +533,7 @@ public class UserReg extends javax.swing.JFrame {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         int selectedRow = jTable1.getSelectedRow();
-        
+
         if (selectedRow == -1) {
             System.out.println("Please select a row");
         } else {
@@ -526,6 +541,13 @@ public class UserReg extends javax.swing.JFrame {
                 String id = String.valueOf(jTable1.getValueAt(selectedRow, 0));
 
                 MySQLNew.executeIUD("DELETE FROM `user` WHERE `user_id` = '" + id + "'");
+
+                JOptionPane.showMessageDialog(
+                        this, // parent
+                        "User deleted successfully", // message
+                        "Confirmation", // title
+                        JOptionPane.INFORMATION_MESSAGE // type
+                );
 
                 loadUsers();
                 reset();
