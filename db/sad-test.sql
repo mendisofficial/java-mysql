@@ -27,8 +27,8 @@ CREATE TABLE `gender` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `gender` (`id`, `name`) VALUES
-(1,	'male'),
-(2,	'female');
+(1,	'Male'),
+(2,	'Female');
 
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
